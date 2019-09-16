@@ -1,6 +1,6 @@
 const pixelsArray = []
-const pixelsWidth = 60	//largura do fogo
-const pixelsHeight = 60	//altura do fogo
+const pixelsWidth = 80	//largura do fogo
+const pixelsHeight = 45	//altura do fogo
 const fireColorsPalette = [
 	{"r":7,"g":7,"b":7},
 	{"r":31,"g":7,"b":7},
@@ -46,7 +46,7 @@ function start(){
 	createFire()
 	render()
 	
-	setInterval(calculatePropagation,50)
+	setInterval(calculatePropagation,25)
 }
 function createDataStructure(){
 	const numberOfPixels = pixelsWidth * pixelsHeight
@@ -57,6 +57,7 @@ function createDataStructure(){
 	
 }
 function calculatePropagation(){
+	
 	for (let column = 0;column<pixelsWidth;column++){
 		for (let row = 0;row<pixelsHeight;row++){	
 			const pixelIndex = column +(pixelsWidth * row)
@@ -76,44 +77,28 @@ function updateIntensity(currentPixelIndex){
 	const belowPixelFireIntensity = pixelsArray[belowPixelIndex]
 	const newFireIntensity  = belowPixelFireIntensity - decay >=  0 ? belowPixelFireIntensity - decay : 0
 
-	pixelsArray[currentPixelIndex ] = newFireIntensity 
+	pixelsArray[currentPixelIndex - decay] = newFireIntensity 
 }
 function render(){
-	const debug = false
-	
-	let html  = '<table cellpadding = 0 cellspacing = 0>'
-	
+	const canvas = document.getElementById('fireCanvas');
+	const ctx = canvas.getContext('2d');
+
+	ctx.fillStyle = 'black';
+	ctx.fillRect(0, 0, 1366, 768);
 	for (let row = 0;row < pixelsHeight;row++){
-		html += '<tr>'
 		
 		for (let column = 0; column<pixelsWidth;column++){
 			const pixelIndex = column + (pixelsWidth * row)
 			const fireIntensity = pixelsArray[pixelIndex]
-			
-			if(debug===true){
-	
-				html += '<td>'
-				html += `<div class = "pixel-index">${pixelIndex}</div>`
-				html += fireIntensity
-				html += '</td>'				
-				
-			}else{
-				const color = fireColorsPalette[fireIntensity]
-				
-				const colorString = `${color.r},${color.g},${color.b}`
-				
-				html += `<td class ="pixel" style = "background-color: rgb(${colorString})">`
-				html += `</td>` 
-			}
-			
 
+			const color = fireColorsPalette[fireIntensity]
+			const colorString = `rgb(${color.r},${color.g},${color.b})`
+				
+			ctx.fillStyle = colorString;
+			ctx.fillRect(17*column, 17*row, 17, 17);
 		}
-		
-		html +='</tr>'
-	}
 	
-	html += '</table>'
-	document.querySelector('#fireCanvas').innerHTML = html
+	}
 }
 function createFire(){
 	for(let column = 0; column<=pixelsWidth ; column++){
